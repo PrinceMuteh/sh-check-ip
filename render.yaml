@@ -9,7 +9,3 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 22.22.0
-      - key: TOOL_PASSWORD
-        sync: false
-      - key: ALLOWED_HOSTS
-        sync: false

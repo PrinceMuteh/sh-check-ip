@@ -13,13 +13,13 @@ test('requires exact allowed host and refuses embedded credentials',()=>{
   assert.throws(()=>targetURL('file:///etc/passwd'));
   delete process.env.ALLOWED_HOSTS;
 });
-test('checks tool password and fails closed in production',()=>{
+test('enforces configured password and supports production without environment settings',()=>{
   process.env.TOOL_PASSWORD='test-secret';
   assert.throws(()=>authorize(new Request('https://example.com')));
   authorize(new Request('https://example.com',{headers:{'x-tool-password':'test-secret'}}));
   delete process.env.TOOL_PASSWORD;
   const previous=process.env.NODE_ENV; process.env.NODE_ENV='production';
-  assert.throws(()=>authorize(new Request('https://example.com')));
-  assert.throws(()=>targetURL('https://example.com'));
+  assert.doesNotThrow(()=>authorize(new Request('https://example.com')));
+  assert.equal(targetURL('https://example.com').hostname, 'example.com');
   if(previous) process.env.NODE_ENV=previous; else delete process.env.NODE_ENV;
 });

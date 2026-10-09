@@ -8,19 +8,22 @@ Use Node.js 22 or newer:
 
 ```sh
 npm install
-cp .env.example .env.local
 npm run dev
 ```
 
-Set `TOOL_PASSWORD` to your own password. Change `ALLOWED_HOSTS` to your endpoint's hostname, or leave it empty for local development to allow any public host. Open http://localhost:3000 and enter your tool password. No tokens or results are written to disk, browser storage, or application logs.
+No `.env` file is required. Open http://localhost:3000 and leave the tool password blank. Optionally copy `.env.example` to `.env.local` to configure access restrictions. No tokens or results are written to disk, browser storage, or application logs.
 
 ## Deploy on Render
 
 1. Push this directory to a GitHub repository.
 2. In Render, create a **Blueprint** from that repository to use `render.yaml`, or create a **Node Web Service** with build command `npm ci && npm run build` and start command `npm start`.
-3. Set `TOOL_PASSWORD` to a long random secret.
-4. Set `ALLOWED_HOSTS` to exact endpoint hostnames, separated by commas, such as `api.example.com,other.example.com`. Do not include protocols or paths. Both settings are required in production.
-5. Deploy and open the service URL. Enter the tool password, click **Check IPs**, then enter the endpoint and token and send your request.
+3. Deploy and open the service URL. Leave the tool password blank, click **Check IPs**, then enter the endpoint and token and send your request. No environment variables are required.
+
+Optional settings in Render’s Environment panel:
+- `TOOL_PASSWORD`: a password you choose. Default: empty (no password required). If set, enter it in the page’s tool password field.
+- `ALLOWED_HOSTS`: comma-separated exact endpoint hostnames, e.g. `api.example.com,other.example.com`. Default: empty (any public HTTP(S) hostname). Do not include protocols or paths.
+
+With the defaults, anyone who can reach the app can use it to make requests to public endpoints. Your API Bearer token is still supplied separately in the form.
 
 Deploy as a web service because the endpoint calls require a server. Reference: https://render.com/docs/deploy-nextjs-app
 
@@ -33,7 +36,7 @@ Deploy as a web service because the endpoint calls require a server. Reference: 
 
 ## Request behavior
 
-Only public HTTP(S) destinations are supported. Private, loopback, reserved, and link-local IPs are rejected. DNS addresses are validated and the connection is pinned to a validated address. Production requests are restricted by `ALLOWED_HOSTS`. Redirects are returned without following them so credentials are not forwarded to a different destination.
+Only public HTTP(S) destinations are supported. Private, loopback, reserved, and link-local IPs are rejected. DNS addresses are validated and the connection is pinned to a validated address. Requests are restricted by `ALLOWED_HOSTS` when it is configured. Redirects are returned without following them so credentials are not forwarded to a different destination.
 
 Each outbound connection has a 20-second timeout. Response bodies are limited to 1 MB; request input is limited to 64 KB. Response bodies are displayed as text, with JSON formatted when possible. Binary downloads and streaming are not supported. Request bodies use `Content-Type: application/json` when present. GET and HEAD requests have no body.
 
